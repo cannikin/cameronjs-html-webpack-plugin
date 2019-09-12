@@ -1,0 +1,25 @@
+{
+  "name": "cameronjs-html-webpack-plugin",
+  "description": "Adds syntax for simple HTML layouts and partials",
+  "author": {
+    "name": "Rob Cameron",
+    "email": "cannikin@fastmail.com",
+    "url": "https://ridingthecluch.com"
+  },
+  "keywords": [
+    "html",
+    "layouts",
+    "partials",
+    "include",
+    "webpack",
+    "plugin",
+    "cameronjs"
+  ],
+  "homepage": "https://cameronjs.com",
+  "license": "MIT",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "peerDependencies": {
+    "webpack": "^4.0.0"
+  }
+}
