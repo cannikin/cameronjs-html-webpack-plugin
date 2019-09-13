@@ -22,7 +22,7 @@ class CameronJSHtmlWebpackPlugin {
   }
 
   processLayouts(content) {
-    const match = content.match(/^\s*@@layout\(['"](.*?)['"]\)/);
+    const match = content.match(/^\s*@@layout\(['"](.*?)['"]\)/m);
 
     if (match) {
       const layoutPath = path.join(this.context, this.layouts, `${match[1]}.html`);
@@ -37,7 +37,7 @@ class CameronJSHtmlWebpackPlugin {
   processPartials(content) {
     const includeRegex = new RegExp(
       /^\s*@@include\(([^,)]*)(?:,\s*({[\W\w\s\d:,\[\]{}"]*}\s*))?\)/,
-      "g"
+      "gm"
     );
 
     content = content.replace(includeRegex, (reg, partial, args) => {
