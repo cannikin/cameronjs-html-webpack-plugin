@@ -20,8 +20,7 @@ module.exports = {
   plugins: [
     new CameronJSHtmlWebpackPlugin({
       source: "./src/html",
-      layouts: "layouts",
-      partials: "partials"
+      layouts: "layouts"
     })
   ],
   // ...
@@ -33,8 +32,6 @@ module.exports = {
 `source` is relative to `webpack.config.js` and is where your HTML templates live.
 
 `layouts` is relative to `source` and is where your layout files live.
-
-`partials` is realtive to `source` and is where your partials live.
 
 Generated HTML pages will be emitted to the `output.path` set in the config file.
 
@@ -90,7 +87,7 @@ Layouts are great for parts of your site that don't change between pages. This w
 **Partials** are smaller snippets of HTML that you want to share between pages. A navigation bar is a good example:
 
 ```html
-<!-- src/html/partials/nav.html -->
+<!-- src/html/_nav.html -->
 
 <nav>
   <ul>
@@ -100,12 +97,12 @@ Layouts are great for parts of your site that don't change between pages. This w
 </nav>
 ```
 
-Then in the page where you want to use the partial you'll provide a `@@partial` declaration:
+Note that the filename must begin with a _underscore. This helps you distinguish between full pages and partials when you're looking at a list of files in your editor. In the page where you want to use the partial you'll provide a `@@partial` declaration (this time *without* the leading underscore):
 
 ```html
 <!-- src/html/index.html -->
 
-@@partial("nav")
+@@partial("nav.html")
 <h1>Hello, world</h1>
 ```
 
@@ -129,7 +126,7 @@ And the final built HTML page would look like:
 You can pass variable substitutions to partials if you want the parent page to make some data available to the child partial.
 
 ```html
-<!-- src/html/partials/title.html -->
+<!-- src/html/parts/_title.html -->
 
 <header>
   <h1>@@pageTitle</h1>
@@ -138,12 +135,14 @@ You can pass variable substitutions to partials if you want the parent page to m
 
 <!-- src/html/index.html -->
 
-@@partial("title", { "pageTitle": "Welcome!", "user": { "name": "Rob" } })
+@@partial("parts/title.html", { "pageTitle": "Welcome!", "user": { "name": "Rob" } })
 
 <main>
   <p>Lorem ipsum dolar sit amet...</p>
 </main>
 ```
+
+Note that in the above example the partial lived in a different directory than the main file.
 
 ### Notes
 
@@ -154,7 +153,7 @@ You can combine partials and layouts and reference one from the other. Perhaps y
 
 <!DOCTYPE html>
 <html>
-@@partial("head")
+@@partial("head.html")
 <body>
   <h1>My Site</h1>
   @@content
@@ -165,7 +164,7 @@ You can combine partials and layouts and reference one from the other. Perhaps y
 
 <!DOCTYPE html>
 <html>
-@@partial("admin")
+@@partial("admin.html")
 <body>
   <h1>Admins Only</h1>
   @@content

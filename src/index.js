@@ -6,7 +6,6 @@ class CameronJSHtmlWebpackPlugin {
   constructor(config) {
     this.source = config.source; // source from the context
     this.layouts = config.layouts; // source from the context
-    this.partials = config.partials;
     this.context = null;
     this.destination = config.destination;
 
@@ -41,8 +40,12 @@ class CameronJSHtmlWebpackPlugin {
     );
 
     content = content.replace(includeRegex, (reg, partial, args) => {
-      const partialPath = path.join(this.context, this.partials, partial.replace(/['"]/g, ""));
-      return utils.getFileContent(partialPath, args);
+      let partialPath = path.join(this.context, partial.replace(/['"]/g, ""));
+      const basename = path.basename(partialPath);
+      partialPath = partialPath.replace(basename, `_${basename}`);
+
+      // finds partial relative to context, with filename starting with an _underscore
+      return utils.getPartialContent(partialPath, args);
     });
 
     return content;
@@ -59,10 +62,9 @@ class CameronJSHtmlWebpackPlugin {
       const sourcePath = path.join(this.context, file);
       const destinationPath = this.destination ? path.join(this.destination, file) : file;
       const layoutsPath = path.join(this.context, this.layouts);
-      const partialsPath = path.join(this.context, this.partials);
       const content = this.processFile(compilation, sourcePath);
 
-      if (!sourcePath.match(layoutsPath) && !sourcePath.match(partialsPath)) {
+      if (!sourcePath.match(layoutsPath) && !path.basename(sourcePath).match(/^_/)) {
         compilation.assets[destinationPath] = {
           source: () => content,
           size: () => content.length

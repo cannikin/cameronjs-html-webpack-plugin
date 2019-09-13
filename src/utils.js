@@ -16,7 +16,7 @@ function is_dir(path) {
   }
 }
 
-function getFileContent(path, args) {
+function getPartialContent(path, args) {
   let content = fs.readFileSync(path).toString();
 
   const substituteArgs = args =>
@@ -56,5 +56,5 @@ function getRequiredFiles(context, path) {
 module.exports = {
   logger,
   getRequiredFiles,
-  getFileContent
+  getPartialContent
 };
