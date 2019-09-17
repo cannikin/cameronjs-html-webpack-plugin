@@ -16,7 +16,6 @@ class CameronJSHtmlWebpackPlugin {
   processFile(compilation, file) {
     let content = fs.readFileSync(file, "utf-8");
     compilation.fileDependencies.add(file);
-    console.log(file);
     return this.processPartials(this.processLayouts(content));
   }
 
