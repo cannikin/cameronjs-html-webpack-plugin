@@ -16,11 +16,9 @@ function is_dir(path) {
   }
 }
 
-function getPartialContent(path, args) {
-  let content = fs.readFileSync(path).toString();
-
+function replaceVars(content, args) {
   const substituteArgs = args =>
-    content.replace(/@@([\w.]+)/g, (_regex, arg) =>
+    content.replace(/@@(?!content)([\w.]+)/g, (_regex, arg) =>
       arg.split(".").reduce((acc, key) => acc[key], args)
     );
 
@@ -56,5 +54,5 @@ function getRequiredFiles(context, path) {
 module.exports = {
   logger,
   getRequiredFiles,
-  getPartialContent
+  replaceVars
 };

@@ -16,18 +16,24 @@ class CameronJSHtmlWebpackPlugin {
   processFile(compilation, file) {
     let content = fs.readFileSync(file, "utf-8");
     compilation.fileDependencies.add(file);
-
+    console.log(file);
     return this.processPartials(this.processLayouts(content));
   }
 
   processLayouts(content) {
-    const match = content.match(/^\s*@@layout\(['"](.*?)['"]\)/m);
+    const match = content.match(/^@@layout\(["'](.*?)["'](?:,\s*({[^\n]*}\s*))?\)/m);
 
     if (match) {
       const layoutPath = path.join(this.context, this.layouts, `${match[1]}.html`);
-      const layoutContent = this.processPartials(fs.readFileSync(layoutPath, "utf-8"));
 
-      return layoutContent.replace(/@@content/, content.replace(/^\s*@@layout.*$/m, ""));
+      // process any partials that might be in the layout itself
+      let layoutContent = this.processPartials(fs.readFileSync(layoutPath, "utf-8"));
+
+      // replace any variables in the layout passed in the @@layout call
+      layoutContent = utils.replaceVars(layoutContent, match[2]);
+
+      // replace @@content in the layout with the actual content that was just passed in
+      return layoutContent.replace(/@@content/, content.replace(/^@@layout.*$/m, ""));
     } else {
       return content;
     }
@@ -44,8 +50,7 @@ class CameronJSHtmlWebpackPlugin {
       const basename = path.basename(partialPath);
       partialPath = partialPath.replace(basename, `_${basename}`);
 
-      // finds partial relative to context, with filename starting with an _underscore
-      return utils.getPartialContent(partialPath, args);
+      return utils.replaceVars(fs.readFileSync(partialPath, "utf-8").toString(), args);
     });
 
     return content;

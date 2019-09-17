@@ -47,7 +47,7 @@ Generated HTML pages will be emitted to the `output.path` set in the config file
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Site</title>
+  <title>@@title</title>
 </head>
 <body>
   @@content
@@ -55,12 +55,14 @@ Generated HTML pages will be emitted to the `output.path` set in the config file
 </html>
 ```
 
-You use `@@content` to denote where the real content of your page will be inserted into the layout. In your actual pages you add a `@@layout` declaration to say which one to use:
+You use `@@content` to denote where the real content of your page will be inserted into the layout and any other variables you want to be replaced by prefixing them with `@@`.
+
+To denote that a page should use a layout add a `@@layout` declaration at the top of the page to say which one to use, with an optional list of those variables you want to substitute:
 
 ```html
 <!-- src/html/index.html -->
 
-@@layout("application")
+@@layout("application", { "title": "My Site" })
 <h1>Hello, world</h1>
 ```
 
