@@ -68,7 +68,10 @@ class CameronJSHtmlWebpackPlugin {
       const layoutsPath = path.join(this.context, this.layouts);
       const content = this.processFile(compilation, sourcePath);
 
-      if (!sourcePath.match(layoutsPath) && !path.basename(sourcePath).match(/^_/)) {
+      if (
+        !sourcePath.match(new RegExp(`${layoutsPath}/`)) &&
+        !path.basename(sourcePath).match(/^_/)
+      ) {
         compilation.assets[destinationPath] = {
           source: () => content,
           size: () => content.length
