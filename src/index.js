@@ -2,6 +2,9 @@ const path = require("path");
 const fs = require("fs");
 const utils = require("./utils");
 
+const CONTENT_FOR_REGEX = /@@contentFor\(['"](.*?)['"],\n(.*?)\n\)/gs;
+const LAYOUT_CONTENT_FOR_REGEX = /@@content\(['"](.*?)['"]/g;
+
 class CameronJSHtmlWebpackPlugin {
   constructor(config) {
     this.source = config.source; // source from the context
@@ -19,6 +22,50 @@ class CameronJSHtmlWebpackPlugin {
     return this.processPartials(this.processLayouts(content));
   }
 
+  // replaces instances of @@content("name") in a layout with @@contentFor("name", ...) from the content
+
+  processNamedContent(layout, content) {
+    let newLayout = layout;
+
+    // look for named content hooks @@content("name") in the layout
+    if (layout.match(LAYOUT_CONTENT_FOR_REGEX)) {
+      let matches = [];
+      let contentFors = {};
+
+      // look for named content hooks @@contentFor("name", ...) in the content itself
+      if (content.match(CONTENT_FOR_REGEX)) {
+        while ((matches = CONTENT_FOR_REGEX.exec(content))) {
+          contentFors[matches[1]] = matches[2];
+        }
+      }
+
+      // replace any @@content("name") with the requisite @@contentFor
+      if (Object.keys(contentFors).length) {
+        for (let name in contentFors) {
+          newLayout = newLayout.replace(`@@content("${name}")`, contentFors[name]);
+        }
+      }
+    }
+
+    // replace any remaining @@content("name") with nothing
+    newLayout = newLayout.replace(/@@content\(['"].*?['"]\)/g, "");
+
+    return newLayout;
+  }
+
+  // replaces instances of @@content in the layout with the actual body of the content
+
+  processMainContent(layout, content) {
+    let newContent = content;
+
+    // remove any instances of @@contentFor("name", ...) in the body of the content
+    newContent = newContent.replace(CONTENT_FOR_REGEX, "");
+    // remove any instances of @@layout in the body of the content
+    newContent = newContent.replace(/^@@layout.*$/m, "");
+
+    return layout.replace(/@@content$/m, newContent);
+  }
+
   processLayouts(content) {
     const match = content.match(/^@@layout\(["'](.*?)["'](?:,\s*({[^\n]*}\s*))?\)/m);
 
@@ -31,8 +78,11 @@ class CameronJSHtmlWebpackPlugin {
       // replace any variables in the layout passed in the @@layout call
       layoutContent = utils.replaceVars(layoutContent, match[2]);
 
-      // replace @@content in the layout with the actual content that was just passed in
-      return layoutContent.replace(/@@content/, content.replace(/^@@layout.*$/m, ""));
+      // replace named @@content sections, like @@content("hero")
+      layoutContent = this.processNamedContent(layoutContent, content);
+
+      // replace main @@content in the layout with the actual content that was just passed in
+      return this.processMainContent(layoutContent, content);
     } else {
       return content;
     }
