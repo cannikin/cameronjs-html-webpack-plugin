@@ -49,7 +49,12 @@ class CameronJSHtmlWebpackPlugin {
       const basename = path.basename(partialPath);
       partialPath = partialPath.replace(basename, `_${basename}`);
 
-      return utils.replaceVars(fs.readFileSync(partialPath, "utf-8").toString(), args);
+      try {
+        return utils.replaceVars(fs.readFileSync(`${partialPath}.html`, "utf-8").toString(), args);
+      } catch (e) {
+        utils.logger.error(`ERROR: Could not find partial ${partial}`);
+        process.exit(0);
+      }
     });
 
     return content;
