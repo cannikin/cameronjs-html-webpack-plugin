@@ -18,9 +18,12 @@ function is_dir(path) {
 
 function replaceVars(content, args) {
   const substituteArgs = args =>
-    content.replace(/@@(?!content)([\w.]+)/g, (_regex, arg) =>
-      arg.split(".").reduce((acc, key) => acc[key], args)
-    );
+    content.replace(/@@(?!(content|include))([\w.]+)/g, varName => {
+      return varName
+        .substring(2)
+        .split(".")
+        .reduce((acc, key) => acc[key], args);
+    });
 
   if (args) {
     try {
