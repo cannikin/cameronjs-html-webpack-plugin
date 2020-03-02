@@ -17,10 +17,10 @@
   ],
   "homepage": "https://cameronjs.com",
   "license": "MIT",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "main": "src/index.js",
   "peerDependencies": {
-    "webpack": "^4.0.0"
+    "webpack": "^4.42.0"
   },
   "repository": {
     "type": "git",
