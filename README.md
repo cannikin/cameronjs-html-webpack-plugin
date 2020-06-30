@@ -84,6 +84,86 @@ The final rendered HTML will be emitted to wherever output.path is set in `webpa
 
 Layouts are great for parts of your site that don't change between pages. This way you write them once and share them everywhere.
 
+#### Named Content
+
+You may find the need to insert content into more than one place in your layout. For example, if you have a banner that should be displayed on the page, but it needs to be outside of the container for your normal content:
+
+```html
+<!-- src/html/layouts/application.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Site</title>
+</head>
+<body>
+  <header>
+    <h1>Logo</h1>
+    <!-- Banner needs to go here -->
+  </header>
+  <main>
+    <!-- Main content goes here -->
+  </main>
+</body>
+</html>
+```
+
+You can mark the spot where the named content will go by passing a parameter to `@@content`:
+
+```html
+<!-- src/html/layouts/application.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Site</title>
+</head>
+<body>
+  <header>
+    <h1>Logo</h1>
+    @@content("banner")
+  </header>
+  <main>
+    @@content
+  </main>
+</body>
+</html>
+```
+
+And then in the main content HTML include a `@@content` declaration with the same name:
+
+```html
+<!-- src/html/index.html -->
+
+@@content("banner",
+  <div id="banner">This is important info</div>
+)
+
+<p>This is the main body text.</p>
+```
+
+The resulting HTML will be:
+
+```html
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Site</title>
+</head>
+<body>
+  <header>
+    <h1>Logo</h1>
+    <div id="banner">This is important info</div>
+  </header>
+  <main>
+    <p>This is the main body text.</p>
+  </main>
+</body>
+</html>
+```
+
 ### Partials
 
 **Partials** are smaller snippets of HTML that you want to share between pages. A navigation bar is a good example:
@@ -99,12 +179,12 @@ Layouts are great for parts of your site that don't change between pages. This w
 </nav>
 ```
 
-Note that the filename must begin with a _underscore. This helps you distinguish between full pages and partials when you're looking at a list of files in your editor. In the page where you want to use the partial you'll provide a `@@partial` declaration (this time *without* the leading underscore):
+Note that the filename must begin with a _underscore. This helps you distinguish between full pages and partials when you're looking at a list of files in your editor. In the page where you want to use the partial you'll provide a `@@partial` declaration (this time *without* the leading underscore, or `.html` extension):
 
 ```html
 <!-- src/html/index.html -->
 
-@@partial("nav.html")
+@@partial("nav")
 <h1>Hello, world</h1>
 ```
 
@@ -137,7 +217,7 @@ You can pass variable substitutions to partials if you want the parent page to m
 
 <!-- src/html/index.html -->
 
-@@partial("parts/title.html", { "pageTitle": "Welcome!", "user": { "name": "Rob" } })
+@@partial("parts/title", { "pageTitle": "Welcome!", "user": { "name": "Rob" } })
 
 <main>
   <p>Lorem ipsum dolar sit amet...</p>
